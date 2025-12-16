@@ -1,6 +1,7 @@
 package generator
 
 import (
+	_ "embed"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -8,6 +9,9 @@ import (
 	"jmsc/pkg/types"
 	"jmsc/pkg/utils"
 )
+
+//go:embed clash_template.yaml
+var clashTemplate []byte
 
 // ClashOutputMode 输出模式
 type ClashOutputMode string
@@ -26,10 +30,12 @@ func GenerateClash(proxies []*types.Proxy, mode ClashOutputMode) (string, error)
 
 	// 转换为 Clash 格式的 map
 	var clashProxies []map[string]any
+	var proxyNames []string
 	for _, proxy := range proxies {
 		node := proxyToClashMap(proxy)
 		if node != nil {
 			clashProxies = append(clashProxies, node)
+			proxyNames = append(proxyNames, proxy.Name)
 		}
 	}
 
@@ -37,13 +43,14 @@ func GenerateClash(proxies []*types.Proxy, mode ClashOutputMode) (string, error)
 	var output any
 	switch mode {
 	case ModeProxies:
-		output = map[string]any{"proxies": clashProxies}
+		// 使用模板生成完整配置
+		output = buildFromTemplate(clashProxies, proxyNames)
 	case ModePayload:
 		output = map[string]any{"payload": clashProxies}
 	case ModeNone:
 		output = clashProxies
 	default:
-		output = map[string]any{"proxies": clashProxies}
+		output = buildFromTemplate(clashProxies, proxyNames)
 	}
 
 	// 生成 YAML
@@ -53,6 +60,30 @@ func GenerateClash(proxies []*types.Proxy, mode ClashOutputMode) (string, error)
 	}
 
 	return string(data), nil
+}
+
+// buildFromTemplate 从模板构建完整配置
+func buildFromTemplate(clashProxies []map[string]any, proxyNames []string) map[string]any {
+	// 解析模板
+	var config map[string]any
+	if err := yaml.Unmarshal(clashTemplate, &config); err != nil {
+		// 模板解析失败，使用默认配置
+		config = make(map[string]any)
+	}
+
+	// 注入 proxies
+	config["proxies"] = clashProxies
+
+	// 注入 proxy-groups 中的 proxies 列表
+	if groups, ok := config["proxy-groups"].([]any); ok {
+		for _, g := range groups {
+			if group, ok := g.(map[string]any); ok {
+				group["proxies"] = proxyNames
+			}
+		}
+	}
+
+	return config
 }
 
 // GenerateClashNode 生成单个节点的 YAML

@@ -1,0 +1,12 @@
+mode: rule
+log-level: info
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies: []
+
+rules:
+  - DOMAIN-SUFFIX,google.com,PROXY
+  - GEOIP,CN,DIRECT
+  - MATCH,PROXY
