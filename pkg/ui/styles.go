@@ -93,7 +93,7 @@ var Version = "dev"
 // PrintLogo 打印 Logo
 func PrintLogo() {
 	fmt.Println(LogoStyle.Render(logoASCII))
-	fmt.Println(MutedStyle.Render("Just My Socks to Clash " + Version))
+	fmt.Println(MutedStyle.Render("JustMySocks to Clash " + Version))
 	fmt.Println()
 }
 
