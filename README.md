@@ -3,7 +3,7 @@
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
-将 [JustMySocks](https://justmysocks.net/) 订阅地址转换为 Clash 配置文件的命令行工具。
+将 [JustMySocks](https://justmysocks.net/members/aff.php?aff=12439) 订阅地址转换为 Clash 配置文件的命令行工具。
 
 **为什么需要离线转换？** 市面上大多数在线订阅转换服务需要你提交订阅链接，这意味着你的节点信息会经过第三方服务器，存在被记录或滥用的风险。jmsc 完全在本地运行，你的订阅数据不会离开你的设备。
 
